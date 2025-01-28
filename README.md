@@ -20,6 +20,7 @@ Its entire purpose is to demonstrate my skills and growth with relevant software
 - [x] upload raw datasets for different industries
 - [x] add sources.md for all third-party datasets
 - [x] add licenses.md for datasets and this project
+- [x] > Restart project with LFS integration to allow large datasets.
 - [ ] transform data with SQL and upload output
 - [ ] transform data with Python and upload output
 - [ ] transform data with R and upload output
