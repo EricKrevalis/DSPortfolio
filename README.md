@@ -17,7 +17,9 @@ Its entire purpose is to demonstrate my skills and growth with relevant software
 
 *TODO:*
 - [x] create project structure
-- [ ] upload raw datasets for diverse industries (and reference)
+- [x] upload raw datasets for different industries
+- [x] add sources.md for all third-party datasets
+- [x] add licenses.md for datasets and this project
 - [ ] transform data with SQL and upload output
 - [ ] transform data with Python and upload output
 - [ ] transform data with R and upload output
