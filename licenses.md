@@ -2,7 +2,7 @@
 
 ### Open Database License (ODbL)
 This project uses datasets licensed under the **[Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/)**. \
-Key requirements:\
+Key requirements:
 
 ### For Original Datasets:
 - **Attribution**: All datasets are credited in [sources.md](https://github.com/EricKrevalis/DSPortfolio/blob/main/sources.md).
