@@ -2,6 +2,8 @@
 
 ## Kaggle Datasets
 
+These are the databases from Kaggle located in [0_Data/0.1_Raw](https://github.com/EricKrevalis/DSPortfolio/tree/main/0_Data/0.1_Raw)
+
 ### Dataset 1: [01_avocado_prices]
 - **Source**: [Justin Kiggins] via [Kaggle](https://www.kaggle.com/datasets/neuromusic/avocado-prices)
 - **Original License**: [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/)
@@ -65,6 +67,8 @@
 ---
 
 ## Wise Owl Training Files
+
+These are the Wise Owl Excel exercises located in [4_Excel/4.1_Training_Files](https://github.com/EricKrevalis/DSPortfolio/tree/main/4_Excel/4.1_Training_Files)
 
 ### Training 1: [01_ExcelBasics_Training]
 - **Source**: [Wise Owl Training Exercise](https://www.wiseowl.co.uk/excel/exercises/standard/excel-basics/4889/) ([All Exercises](https://www.wiseowl.co.uk/excel/exercises/standard/))
