@@ -123,7 +123,7 @@ These are the Wise Owl Excel exercises located in [4_Excel/4.1_Training_Files](h
 ### Training 11: [11_FormattingNumbersAndDates_Training]
 - **Source**: [Wise Owl Training Exercise](https://www.wiseowl.co.uk/excel/exercises/standard/formatting-numbers-and-dates/4929/) ([All Exercises](https://www.wiseowl.co.uk/excel/exercises/standard/))
 - **Original License**: Used with written permission - see [terms and conditions](https://www.wiseowl.co.uk/sundry/terms-conditions/)
-- **Modifications**: None (used as-is). Solved training and displayed solution.
+- **Modifications**: Corrected a mistake in original file, which didn't correctly copy the cells in the table. Solved training and displayed solution.
 
 ### Training 12: [12_WorkingWithDates_Training]
 - **Source**: [Wise Owl Training Exercise](https://www.wiseowl.co.uk/excel/exercises/standard/working-with-dates/4984/) ([All Exercises](https://www.wiseowl.co.uk/excel/exercises/standard/))
