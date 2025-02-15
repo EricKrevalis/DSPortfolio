@@ -11,7 +11,7 @@ Its entire purpose is to demonstrate my skills and growth with relevant software
 | [1_SQL](https://github.com/EricKrevalis/DSPortfolio/tree/main/1_SQL) | Contains SQL queries and resulting output |
 | [2_Python](https://github.com/EricKrevalis/DSPortfolio/tree/main/2_Python) | Contains Python scripts and resulting output |
 | [3_R](https://github.com/EricKrevalis/DSPortfolio/tree/main/3_R) | Contains R scripts and resulting output |
-| [4_Excel](https://github.com/EricKrevalis/DSPortfolio/tree/main/4_Excel) | Wise Owl Excel Exercises, raw and solved |
+| [4_Excel](https://github.com/EricKrevalis/DSPortfolio/tree/main/4_Excel) | Contains Wise Owl Excel Exercises, raw and solved |
 | [5_Reports](https://github.com/EricKrevalis/DSPortfolio/tree/main/5_Reports) | Contains analysis reports in Tableau and PowerBI |
 | [6_Notebooks](https://github.com/EricKrevalis/DSPortfolio/tree/main/6_Notebooks) | Contains Python(Jupyter) and R(R Markdown) notebooks |
 
