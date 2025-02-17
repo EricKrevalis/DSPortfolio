@@ -29,12 +29,21 @@ CREATE TABLE airbnb_cleaned_data (
     license VARCHAR(255)
     -- Define all columns as nullable initially
     );
+    
 INSERT INTO airbnb_cleaned_data
 SELECT * FROM airbnb_raw_data_staging;
 
+CREATE TABLE airbnb_cleaning_log (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  cleaning_date DATE,
+  operation VARCHAR(255),
+  affected_rows INT,
+  notes TEXT
+);
+
 -- Update: make NULL for missing data!
 -- Update text columns for empty string ''
-UPDATE airbnb_cleaning_sql.airbnb_cleaned_data
+UPDATE airbnb_cleaned_data
 SET 
     airbnb_id = CASE WHEN airbnb_id IS NULL OR airbnb_id = 0 THEN NULL ELSE airbnb_id END, -- Update numeric column differently
     airbnb_name = NULLIF(airbnb_name, ''),
@@ -64,6 +73,11 @@ SET
     license = NULLIF(REGEXP_REPLACE(license, '[^[:print:]]', ''), '') -- update license, making non-printable characters NULL
 	WHERE id > 0; -- Use the primary key to satisfy safe update mode
 
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-05', "Made missing data NULL", 102599, "Every row was affected, since 'License' was always whitespace. Made sure whitespaces, empty strings and numbers were handled separately.");
+
+select * from airbnb_cleaning_log;
+
 select * from airbnb_cleaned_data;
 
 /*
@@ -77,8 +91,14 @@ HAVING COUNT(*) > 1)
 select *
 from airbnb_raw_data_staging a, duplicates b
 where a.airbnb_id = b.airbnb_id;
+
+-- showing me the ids with duplicates only
+SELECT airbnb_id, COUNT(*)
+FROM airbnb_cleaning_sql.airbnb_cleaned_data
+GROUP BY airbnb_id
+HAVING COUNT(*) > 1;
 */
-    
+
 -- SELECT * from airbnb_raw_data_staging
 -- where geo_lat is null or geo_lat = '';
 
