@@ -76,20 +76,15 @@ SET
 INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
 VALUES ('2025-02-05', "Made missing data NULL", 102599, "Every row was affected, since 'License' was always whitespace. Made sure whitespaces, empty strings and numbers were handled separately.");
 
-select * from airbnb_cleaning_log;
-
-select * from airbnb_cleaned_data;
-
-/*
--- peeking at id duplicates, making sure they occur the way i suspect
+/* -- peeking at id duplicates, making sure they occur the way i suspect
 with duplicates as (SELECT 
 	airbnb_id,
     COUNT(*)
-FROM airbnb_raw_data_staging
+FROM airbnb_cleaned_data
 GROUP BY airbnb_id
 HAVING COUNT(*) > 1)
 select *
-from airbnb_raw_data_staging a, duplicates b
+from airbnb_cleaned_data a, duplicates b
 where a.airbnb_id = b.airbnb_id;
 
 -- showing me the ids with duplicates only
@@ -99,15 +94,87 @@ GROUP BY airbnb_id
 HAVING COUNT(*) > 1;
 */
 
--- SELECT * from airbnb_raw_data_staging
--- where geo_lat is null or geo_lat = '';
+/* -- This kept timing out, even after changing limited time to 300s, try to find problem
+DELETE t1
+FROM airbnb_cleaned_data AS t1
+INNER JOIN airbnb_cleaned_data AS t2
+    ON t1.airbnb_id = t2.airbnb_id
+    AND t1.id > t2.id	-- Keep older/lower ID
+    WHERE t1.id > 0;	-- ensure safe update mode is satisfied
 
+-- finding locks in MySQL 8.0+
+SELECT * FROM performance_schema.metadata_locks 
+WHERE OBJECT_SCHEMA = 'airbnb_cleaning_sql';
 
--- Drop rows with missing critical fields (e.g., location)
--- DELETE FROM airbnb_raw_data_staging
--- WHERE geo_lat IS NULL OR geo_long IS NULL;
+-- some locks exist, figuring out which ones to kill
+SELECT 
+    mdl.LOCK_TYPE,
+    mdl.LOCK_STATUS,
+    mdl.OWNER_THREAD_ID,
+    t.PROCESSLIST_ID AS CONNECTION_ID,
+    t.PROCESSLIST_USER,
+    t.PROCESSLIST_HOST,
+    t.PROCESSLIST_COMMAND,
+    t.PROCESSLIST_TIME,
+    t.PROCESSLIST_INFO AS SQL_TEXT
+FROM performance_schema.metadata_locks mdl
+JOIN performance_schema.threads t
+    ON mdl.OWNER_THREAD_ID = t.THREAD_ID
+WHERE mdl.OBJECT_SCHEMA = 'airbnb_cleaning_sql';
 
--- Replace missing `host_name` with 'Unknown'
--- UPDATE airbnb_raw_data_staging
--- SET host_name = 'Unknown'
--- WHERE host_name IS NULL OR host_name = '';
+-- kill blocked connections
+KILL 14;
+KILL 15;
+KILL 16;
+KILL 9;
+*/
+
+-- try index creation
+CREATE INDEX idx_airbnb_id ON airbnb_cleaned_data(airbnb_id);
+CREATE INDEX idx_id ON airbnb_cleaned_data(id);
+
+-- try delete again
+DELETE t1
+FROM airbnb_cleaned_data AS t1
+INNER JOIN airbnb_cleaned_data AS t2
+    ON t1.airbnb_id = t2.airbnb_id
+    AND t1.id > t2.id	-- Keep older/lower ID
+    WHERE t1.id > 0;	-- ensure safe update mode is satisfied
+
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-21', "Removed duplicate airbnb_id 's", 541, "Ran into issues with runtime. Started indexing columns that significantly reduce runtime.");
+
+-- Fill host identity verification NULLs
+UPDATE airbnb_cleaned_data
+SET host_identity_verified = COALESCE(host_identity_verified, 'unconfirmed')
+WHERE host_identity_verified IS NULL AND id > 0;
+
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-22', "Set NULL values in verification to 'unconfirmed'", 289, "Assumed that not having a value for confirmation means 'unconfirmed'.");
+
+-- Set anonymous host names | checked for anonymous names first
+-- select * from airbnb_cleaned_data WHERE host_name = 'ANONYMOUS';
+UPDATE airbnb_cleaned_data
+SET host_name = COALESCE(host_name, 'ANONYMOUS')
+WHERE host_name IS NULL AND id > 0;
+
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-22', "Gave NULL values in host_name the 'ANONYMOUS' tag", 404, "Checked for ANONYMOUS existing. Does not exist and is now used as new tag for empty names.");
+
+-- Set unknown airbnb names | checked for unknown names first
+-- select * from airbnb_cleaned_data WHERE airbnb_name = 'UNKNOWN';
+UPDATE airbnb_cleaned_data
+SET airbnb_name = COALESCE(airbnb_name, 'UNKNOWN')
+WHERE airbnb_name IS NULL AND id > 0;
+
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-22', "Gave NULL values in airbnb_name the 'UNKNOWN' tag", 249, "Checked for UNKNOWN existing. Does not exist and is now used as new tag for empty names.");
+
+-- NEXT CLEANING STEPS:
+-- geo data: lat/long, neighbourhood, country etc etc.
+    
+-- INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+-- VALUES ('2025-02-22', "Gave NULL values in host_name the 'ANONYMOUS' tag", 404, "Checked for ANONYMOUS existing. Does not exist and is now used as new tag for empty names.");
+
+select * from airbnb_cleaning_log;
+select * from airbnb_cleaned_data;
