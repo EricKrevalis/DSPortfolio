@@ -1,8 +1,12 @@
 -- often used to check/veryify tables, take a peek at what might need to be done
 -- check cleaned data table
 select * from airbnb_cleaned_data;
+-- new table
+select * from airbnb_cleaned_data_transformable;
 -- check log table
 select * from airbnb_cleaning_log;
+-- data types
+select * from information_schema.columns;
 
 -- base log file syntax:
 -- log changes
@@ -94,3 +98,49 @@ SELECT *
     INNER JOIN neighbourhood_lookup_b
 	ON neighbourhood_lookup_a.neighbourhood=neighbourhood_lookup_b.neighbourhood
     AND neighbourhood_lookup_a.neighbourhood_group!=neighbourhood_lookup_b.neighbourhood_group;
+    
+-- created hash function to figure out how duplicates exist
+WITH listing_fingerprints AS (
+    SELECT 
+        *,
+        MD5(CONCAT(
+            airbnb_name, 
+            host_name
+        )) AS listing_hash
+    FROM airbnb_cleaned_data
+),
+duplicate_listings AS (
+    SELECT 
+		id,
+        listing_hash,
+        hostid,
+        ROW_NUMBER() OVER (
+            PARTITION BY listing_hash 
+            ORDER BY listing_hash
+        ) AS dup_rank
+    FROM listing_fingerprints WHERE listing_hash IS NOT NULL
+)
+SELECT * FROM airbnb_cleaned_data WHERE id IN (SELECT id FROM duplicate_listings WHERE listing_hash IS NOT NULL AND dup_rank>1);
+
+-- RESULT: hash function works terribly. partition/coalesce is better at filtering for unique entries, take a peek at them
+        
+-- distinct still has issues, since i was only displaying the unique
+        
+WITH duplicates_to_delete AS (
+    SELECT 
+        id,
+        ROW_NUMBER() OVER (
+            PARTITION BY 
+                COALESCE(airbnb_name), 
+                COALESCE(host_name),
+                ROUND(geo_lat, 4),
+                ROUND(geo_long, 4),
+                price_$
+            ORDER BY id
+        ) AS dup_rank
+    FROM airbnb_cleaned_data
+)
+SELECT d.*, o.* 
+FROM duplicates_to_delete d
+JOIN airbnb_cleaned_data o ON d.id = o.id
+WHERE d.dup_rank > 1;

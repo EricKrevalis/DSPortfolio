@@ -432,10 +432,182 @@ WHERE reviews_per_month IS NULL AND number_of_reviews='0' AND id>0;
 INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
 VALUES ('2025-02-23', "reviews_per_month NULL handling", 15795, "Set to 0 if entry does not exist and 0 reviews exist.");
 
-/* -- TODO:
-NULL handling for: last_review, reviews_per_month, review_rate_number, calculated_host_listings_count, license
-AND: handle reviews with care to not alternate data too much, maybe do some calculations on median/averages
-AND: Remove hosts who upload same objects from multiple accounts
-AND: re-calculate calculated_host_listings_count
-AND: maybe remove license columns, since probably unnecessary for transformations
-*/
+-- availability_365 data correction
+UPDATE airbnb_cleaned_data
+SET availability_365 = 365
+WHERE availability_365 > 365 AND id>0;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-27', "availability_365 value correction", 2754, "Exceeding values corrected to 365 for max. available days during the year.");
+
+-- index creation for efficiency of join to remove duplicates
+CREATE INDEX idx_airbnb_name ON airbnb_cleaned_data(airbnb_name);
+CREATE INDEX idx_host_name ON airbnb_cleaned_data(host_name);
+CREATE INDEX idx_geo_lat ON airbnb_cleaned_data(geo_lat);
+CREATE INDEX idx_geo_long ON airbnb_cleaned_data(geo_long);
+CREATE INDEX idx_price_$ ON airbnb_cleaned_data(price_$);
+
+-- delete duplicates depending on the values, round geo_lat and geo_long (4th decimal place is approx 11m accuracy)
+DELETE FROM airbnb_cleaned_data
+WHERE id IN (
+    SELECT id FROM (
+        SELECT 
+            id,
+            ROW_NUMBER() OVER (
+                PARTITION BY 
+                    COALESCE(airbnb_name), 
+                    COALESCE(host_name),
+                    ROUND(geo_lat, 4),
+                    ROUND(geo_long, 4),
+                    price_$
+                ORDER BY id
+            ) AS dup_rank
+        FROM airbnb_cleaned_data
+    ) ranked
+    WHERE dup_rank > 1
+);
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-27', "Duplicate Listing Handling", 32667, "Removed bot accounts/multiple listings from users. Filtered by airbnb_name, host_name, geo_lat, geo_long and price_$");
+
+-- re-calculate host_listings due to deletions
+WITH host_listing_counts AS (
+    SELECT 
+        hostid, 
+        COUNT(*) AS actual_listings
+    FROM airbnb_cleaned_data
+    GROUP BY hostid
+)
+
+UPDATE airbnb_cleaned_data a
+JOIN host_listing_counts h 
+    ON a.hostid = h.hostid
+SET a.calculated_host_listings_count = h.actual_listings
+WHERE id>0;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-27', "host_listings_count correction", 27618, "Re-calculated the host_listings_count due to deletion of duplicates, fake listings or invalid data");
+
+
+-- find out how to re-format dates, here: https://www.w3schools.com/sql/func_mysql_date_format.asp
+
+-- temporary table to not make mistakes
+CREATE TABLE date_format_correction AS (
+SELECT 
+    id, last_review FROM airbnb_cleaned_data
+WHERE last_review IS NOT NULL);
+ALTER TABLE date_format_correction
+ADD corrected_date DATE;
+-- Disable safe mode
+SET SQL_SAFE_UPDATES = 0;
+-- Run update
+UPDATE date_format_correction
+SET corrected_date = 
+    CASE
+        WHEN last_review REGEXP '^[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}$' THEN 
+            STR_TO_DATE(last_review, '%c/%e/%Y')
+        ELSE NULL
+    END;
+-- Re-enable safe mode
+SET SQL_SAFE_UPDATES = 1;
+
+-- insert new dates into original table
+UPDATE airbnb_cleaned_data a JOIN date_format_correction d 
+    SET a.last_review = d.corrected_date
+    WHERE d.id = a.id;
+    
+-- drop unnecessary table
+DROP TABLE date_format_correction;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-27', "last_review date re-format", 58546, "Changed the m/d/YYYY format to YYYY-MM-DD for SQL column formatting.");
+
+-- UPDATE ALL TABLE COLUMN TYPES
+ALTER TABLE airbnb_cleaned_data
+MODIFY host_identity_verified VARCHAR(20);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY neighbourhood_group VARCHAR(50);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY neighbourhood VARCHAR(50);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY geo_lat FLOAT(10,6);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY geo_long FLOAT(10,6);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY country VARCHAR(50);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY country_code VARCHAR(3);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY instant_bookable VARCHAR(5);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY cancellation_policy VARCHAR(20);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY room_type VARCHAR(30);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY construction_year INT(4);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY minimum_nights INT(5);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY number_of_reviews INT(6);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY last_review DATE;
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY reviews_per_month FLOAT(10,2);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY review_rate_number INT(1);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY calculated_host_listings_count INT(3);
+
+ALTER TABLE airbnb_cleaned_data
+MODIFY availability_365 INT(3);
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-28', "Datatype modification", 69386, "Updated the data types in every column to more accurately represent the data inside.");
+
+-- create new table to be able to do transformations, while keeping cleaned version of original file
+CREATE TABLE airbnb_cleaned_data_transformable LIKE airbnb_cleaned_data;
+    
+INSERT INTO airbnb_cleaned_data_transformable
+SELECT * FROM airbnb_cleaned_data;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-28', "NEW TABLE", 69386, "Copied table over to 'airbnb_cleaned_data_transformable', which needs a few cleaning steps before we do transformations.");
+
+-- Delete the rows without price/service fee, since these are not usable for transformation
+DELETE
+FROM airbnb_cleaned_data_transformable
+WHERE (price_$ IS NULL OR service_fee_$ IS NULL) AND id>0;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-28', "NEW TABLE - removed NULL costs", 34, "Deleted every row that contained NULL price or service fee, since these are not usable for transformation.");
+
+-- drop license column
+ALTER TABLE airbnb_cleaned_data_transformable
+DROP COLUMN license;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-02-28', "NEW TABLE - dropped column", 0, "Removed license column, since this has no use for transformation.");
