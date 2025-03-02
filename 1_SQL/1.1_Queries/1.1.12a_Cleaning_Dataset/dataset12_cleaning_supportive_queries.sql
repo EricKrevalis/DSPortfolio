@@ -1,4 +1,6 @@
 -- often used to check/veryify tables, take a peek at what might need to be done
+-- original data
+select * from airbnb_raw_data_staging;
 -- check cleaned data table
 select * from airbnb_cleaned_data;
 -- new table
