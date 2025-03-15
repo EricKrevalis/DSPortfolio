@@ -66,3 +66,7 @@ VALUES ('2025-03-03', "airbnb_transformation_v1_host_policy", 6, "Created fourth
 -- log changes
 INSERT INTO airbnb_transformation_log_v1 (cleaning_date, operation, affected_rows, notes)
 VALUES ('2025-03-03', "Transformation Results", 0, "No correlations found between observed data and host's verified/unconfirmed identity.");
+
+-- log changes
+INSERT INTO airbnb_transformation_log_v1 (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-03-15', "Transformation Results Addendum", 0, "Slight correlations visible only in verification - room_type metric. Around 7.2% increase in price for verified hotel rooms, and around 2.7% increase in price for unverified shared rooms.");

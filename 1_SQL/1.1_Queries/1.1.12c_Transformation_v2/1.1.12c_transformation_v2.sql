@@ -62,3 +62,7 @@ VALUES ('2025-03-03', "airbnb_transformation_v2_policy_location", 15, "Created f
 -- log changes
 INSERT INTO airbnb_transformation_log_v2 (cleaning_date, operation, affected_rows, notes)
 VALUES ('2025-03-03', "Transformation Results", 0, "No correlations found between observed data and cancellation policies.");
+
+-- log changes
+INSERT INTO airbnb_transformation_log_v2 (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-03-15', "Transformation Results Addendum", 0, "Although very small differences, slight correlation between strictness and house rules seem visible. Stricter hosts seem to set around 1.3% longer house rules.");
