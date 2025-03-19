@@ -611,3 +611,48 @@ DROP COLUMN license;
 -- log changes
 INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
 VALUES ('2025-02-28', "NEW TABLE - dropped column", 0, "Removed license column, since this has no use for transformation.");
+
+-- Clean airbnb_name
+UPDATE airbnb_cleaned_data_transformable
+SET 
+    airbnb_name = REPLACE(REPLACE(REPLACE(REPLACE(
+        airbnb_name, 
+        '"', "'"),  -- Replace quotes with apostrophes
+        ',', '.'),   -- Remove commas
+        '\t', ' '),  -- Remove tabs
+        '\n', ' ')  -- Remove newlines
+WHERE id > 0;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-03-19', "airbnb_name text adjustments", 10428, "Replaced quotes, commas, tabs and newlines. Necessary for clean export.");
+
+-- Clean house_rules
+UPDATE airbnb_cleaned_data_transformable
+SET 
+    house_rules = REPLACE(REPLACE(REPLACE(REPLACE(
+        house_rules, 
+        '"', "'"), 
+        ',', '.'), 
+        '\t', ' '), 
+        '\n', ' ')
+WHERE id > 0;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-03-19', "house_rules text adjustments", 18873, "Replaced quotes, commas, tabs and newlines. Necessary for clean export.");
+
+-- Trim years > 2022 to 2022-12-31
+UPDATE airbnb_cleaned_data_transformable
+SET last_review = 
+    CASE
+        WHEN YEAR(last_review) > 2022 THEN 
+            DATE(CONCAT_WS('-', 2022, MONTH(last_review), DAY(last_review)))
+        ELSE
+            last_review
+    END
+WHERE last_review IS NOT NULL AND id>0;
+
+-- log changes
+INSERT INTO airbnb_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-03-19', "last_review correction", 5, "Fixed some minor date mistakes.");

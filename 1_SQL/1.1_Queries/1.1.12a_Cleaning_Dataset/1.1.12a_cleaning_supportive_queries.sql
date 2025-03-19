@@ -9,6 +9,11 @@ select * from airbnb_cleaned_data_transformable;
 select * from airbnb_cleaning_log;
 -- data types
 select * from information_schema.columns;
+-- export csv
+-- INTO OUTFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/airbnb_cleaned_data.csv'
+-- NEEDED SOME EXTRA CLEANING IN TEXT
+
+-- Clean other text fields if needed (neighbourhood, host_name, etc.)
 
 -- base log file syntax:
 -- log changes
