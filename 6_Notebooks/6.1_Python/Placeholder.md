@@ -1,1 +1,0 @@
-*This is only a placeholder file to organize the project on GitHub*
