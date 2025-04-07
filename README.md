@@ -1,6 +1,6 @@
 ### Welcome to my first Data Science portfolio. :)
 
-*Note: This is a work in progress.*
+*Note: This project is a work in progress.*
 
 This project is not meant to be run locally.\
 Its entire purpose is to demonstrate my skills and growth with relevant software.
@@ -12,8 +12,8 @@ Its entire purpose is to demonstrate my skills and growth with relevant software
 | [2_Python](https://github.com/EricKrevalis/DSPortfolio/tree/main/2_Python) | Contains Python scripts and resulting output |
 | [3_R](https://github.com/EricKrevalis/DSPortfolio/tree/main/3_R) | Contains R scripts and resulting output |
 | [4_Excel](https://github.com/EricKrevalis/DSPortfolio/tree/main/4_Excel) | Contains Wise Owl Excel Exercises, raw and solved |
-| [5_Reports](https://github.com/EricKrevalis/DSPortfolio/tree/main/5_Reports) | Contains analysis reports in Tableau and PowerBI |
-| [6_Notebooks](https://github.com/EricKrevalis/DSPortfolio/tree/main/6_Notebooks) | Contains Python(Jupyter) and R(R Markdown) notebooks |
+| [5_Notebooks](https://github.com/EricKrevalis/DSPortfolio/tree/main/5_Notebooks) | Contains Python(Jupyter) and R(R Markdown) notebooks |
+| [6_Reports](https://github.com/EricKrevalis/DSPortfolio/tree/main/6_Reports) | Contains analysis reports in Tableau and PowerBI |
 
 *TODO:*
 - [x] create project structure
@@ -25,12 +25,13 @@ Its entire purpose is to demonstrate my skills and growth with relevant software
 - [x] add licenses.md for datasets, trainings files and this project
 - [x] complete all excel trainings files and upload solutions
 - [x] clean data with SQL
-- [ ] transform cleaned SQL data into meaningful output, upload
+- [x] transform cleaned SQL data into meaningful output, upload
+- [x] analyze data with Python notebooks - learn EDA in Python
+- [x] create notebooks with Jupyter (Python)
 - [ ] clean data with Python
 - [ ] transform cleaned Python data into meaningful output, upload
+- [ ] create notebooks with RMarkdown (R)
 - [ ] clean data with R
 - [ ] transform cleaned R data into meaningful output, upload
 - [ ] create reports with Tableau
 - [ ] create reports with PowerBI
-- [ ] create notebooks with Jupyter (Python)
-- [ ] create notebooks with RMarkdown (R)
