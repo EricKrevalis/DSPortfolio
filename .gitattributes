@@ -1,1 +1,2 @@
 *.csv filter=lfs diff=lfs merge=lfs -text
+5_Notebooks/5.1_Python/5.1.10_the_human_freedom_index/5.1.10b_automated_eda_report.html filter=lfs diff=lfs merge=lfs -text
