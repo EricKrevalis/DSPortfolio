@@ -30,7 +30,7 @@ CREATE TABLE airbnb_raw_data_staging (
     );
     
 -- Importing data with INFILE instead of import wizard. Since data is NOT clean and very large
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/0.12_airbnb_open_data/0.12.1_Raw/Airbnb_Open_Data.csv'
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/12_airbnb_open_data/0_Raw/Airbnb_Open_Data.csv'
 INTO TABLE airbnb_raw_data_staging
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
