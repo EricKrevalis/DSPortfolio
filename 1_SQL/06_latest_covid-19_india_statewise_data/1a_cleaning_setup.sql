@@ -1,37 +1,42 @@
--- create first base table setup, define all columns as nullable initially (or able to have empty strings)
--- CREATE TABLE stagingtable (
---    id INT AUTO_INCREMENT PRIMARY KEY,
---    column1 VARCHAR(255),
---    column2 VARCHAR(255),
---    );
-    
--- Importing data with INFILE instead of import wizard. Since data is NOT clean and very large
--- LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/0.XX_DFNAME/0.XX.1_Raw/DATASET.csv'
--- INTO TABLE stagingtable
--- FIELDS TERMINATED BY ','
--- ENCLOSED BY '"'
--- LINES TERMINATED BY '\n'
--- -- IGNORE 1 ROWS -- only need this if 1st row is empty
--- (id, column1, column2
--- );
+-- Create raw staging table
+CREATE TABLE 06_latest_covid_19_india_statewise_data.covid_india_raw_data_staging (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    State_UTs VARCHAR(255),
+    Total_Cases VARCHAR(255),
+    Active VARCHAR(255),
+    Discharged VARCHAR(255),
+    Deaths VARCHAR(255),
+    Active_Ratio VARCHAR(255),
+    Discharge_Ratio VARCHAR(255),
+    Death_Ratio VARCHAR(255),
+    Population VARCHAR(255)
+);
 
--- make second table which we will use to clean
--- CREATE TABLE cleanedtable (
---    id INT AUTO_INCREMENT PRIMARY KEY,
---    column1 VARCHAR(255),
---    column2 VARCHAR(255),
---    );
--- Define all columns as nullable initially? maybe helps cleaning
-    
--- insert our imported table into our cleaning table
--- INSERT INTO cleanedtable
--- SELECT * FROM stagingtable;
+-- Load CSV data
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/06_latest_covid-19_india_statewise_data/0_Raw/Latest Covid-19 India Status.csv'
+INTO TABLE 06_latest_covid_19_india_statewise_data.covid_india_raw_data_staging
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(State_UTs, Total_Cases, Active, Discharged, Deaths, Active_Ratio, Discharge_Ratio, Death_Ratio, Population);
 
--- create log table, to properly track which changes have been made
--- CREATE TABLE DFNAME_cleaning_log (
--- id INT AUTO_INCREMENT PRIMARY KEY,
--- cleaning_date DATE,
--- operation VARCHAR(255),
--- affected_rows INT,
--- notes TEXT
--- );
+-- Create cleaning table
+CREATE TABLE 06_latest_covid_19_india_statewise_data.covid_india_cleaned_data LIKE 06_latest_covid_19_india_statewise_data.covid_india_raw_data_staging;
+
+-- Copy data to cleaning table
+INSERT INTO 06_latest_covid_19_india_statewise_data.covid_india_cleaned_data
+SELECT * FROM 06_latest_covid_19_india_statewise_data.covid_india_raw_data_staging;
+
+-- Create log table
+CREATE TABLE 06_latest_covid_19_india_statewise_data.covid_india_cleaning_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cleaning_date DATE,
+    operation VARCHAR(255),
+    affected_rows INT,
+    notes TEXT
+);
+
+-- Log initial setup
+INSERT INTO 06_latest_covid_19_india_statewise_data.covid_india_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-07-29', 'Table creation', 36, 'Created staging, cleaning and logging tables.');

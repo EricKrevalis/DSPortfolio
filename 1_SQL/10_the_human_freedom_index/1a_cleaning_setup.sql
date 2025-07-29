@@ -1,37 +1,173 @@
--- create first base table setup, define all columns as nullable initially (or able to have empty strings)
--- CREATE TABLE stagingtable (
---    id INT AUTO_INCREMENT PRIMARY KEY,
---    column1 VARCHAR(255),
---    column2 VARCHAR(255),
---    );
-    
--- Importing data with INFILE instead of import wizard. Since data is NOT clean and very large
--- LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/0.XX_DFNAME/0.XX.1_Raw/DATASET.csv'
--- INTO TABLE stagingtable
--- FIELDS TERMINATED BY ','
--- ENCLOSED BY '"'
--- LINES TERMINATED BY '\n'
--- -- IGNORE 1 ROWS -- only need this if 1st row is empty
--- (id, column1, column2
--- );
+-- Create raw staging table
+CREATE TABLE 10_the_human_freedom_index.freedomindex_raw_data_staging (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    year TEXT,
+    countries TEXT,
+    region TEXT,
+    hf_score TEXT,
+    hf_rank TEXT,
+    hf_quartile TEXT,
+    pf_rol_procedural TEXT,
+    pf_rol_civil TEXT,
+    pf_rol_criminal TEXT,
+    pf_rol_vdem TEXT,
+    pf_rol TEXT,
+    pf_ss_homicide TEXT,
+    pf_ss_homicide_data TEXT,
+    pf_ss_disappearances_disap TEXT,
+    pf_ss_disappearances_violent TEXT,
+    pf_ss_disappearances_violent_data TEXT,
+    pf_ss_disappearances_organized TEXT,
+    pf_ss_disappearances_fatalities TEXT,
+    pf_ss_disappearances_fatalities_data TEXT,
+    pf_ss_disappearances_injuries TEXT,
+    pf_ss_disappearances_injuries_data TEXT,
+    pf_ss_disappearances_torture TEXT,
+    pf_ss_killings TEXT,
+    pf_ss_disappearances TEXT,
+    pf_ss TEXT,
+    pf_movement_vdem_foreign TEXT,
+    pf_movement_vdem_men TEXT,
+    pf_movement_vdem_women TEXT,
+    pf_movement_vdem TEXT,
+    pf_movement_cld TEXT,
+    pf_movement TEXT,
+    pf_religion_freedom_vdem TEXT,
+    pf_religion_freedom_cld TEXT,
+    pf_religion_freedom TEXT,
+    pf_religion_suppression TEXT,
+    pf_religion TEXT,
+    pf_assembly_entry TEXT,
+    pf_assembly_freedom_house TEXT,
+    pf_assembly_freedom_bti TEXT,
+    pf_assembly_freedom_cld TEXT,
+    pf_assembly_freedom TEXT,
+    pf_assembly_parties_barriers TEXT,
+    pf_assembly_parties_bans TEXT,
+    pf_assembly_parties_auton TEXT,
+    pf_assembly_parties TEXT,
+    pf_assembly_civil TEXT,
+    pf_assembly TEXT,
+    pf_expression_direct_killed TEXT,
+    pf_expression_direct_killed_data TEXT,
+    pf_expression_direct_jailed TEXT,
+    pf_expression_direct_jailed_data TEXT,
+    pf_expression_direct TEXT,
+    pf_expression_vdem_cultural TEXT,
+    pf_expression_vdem_harass TEXT,
+    pf_expression_vdem_gov TEXT,
+    pf_expression_vdem_internet TEXT,
+    pf_expression_vdem_selfcens TEXT,
+    pf_expression_vdem TEXT,
+    pf_expression_house TEXT,
+    pf_expression_bti TEXT,
+    pf_expression_cld TEXT,
+    pf_expression TEXT,
+    pf_identity_same_m TEXT,
+    pf_identity_same_f TEXT,
+    pf_identity_same TEXT,
+    pf_identity_divorce TEXT,
+    pf_identity_inheritance_widows TEXT,
+    pf_identity_inheritance_daughters TEXT,
+    pf_identity_inheritance TEXT,
+    pf_identity_fgm TEXT,
+    pf_identity TEXT,
+    pf_score TEXT,
+    pf_rank TEXT,
+    ef_government_consumption TEXT,
+    ef_government_consumption_data TEXT,
+    ef_government_transfers TEXT,
+    ef_government_transfers_data TEXT,
+    ef_government_investment TEXT,
+    ef_government_investment_data TEXT,
+    ef_government_tax_income TEXT,
+    ef_government_tax_income_data TEXT,
+    ef_government_tax_payroll TEXT,
+    ef_government_tax_payroll_data TEXT,
+    ef_government_tax TEXT,
+    ef_government_soa TEXT,
+    ef_government TEXT,
+    ef_legal_judicial TEXT,
+    ef_legal_courts TEXT,
+    ef_legal_protection TEXT,
+    ef_legal_military TEXT,
+    ef_legal_integrity TEXT,
+    ef_legal_enforcement TEXT,
+    ef_legal_regulatory TEXT,
+    ef_legal_police TEXT,
+    ef_gender TEXT,
+    ef_legal TEXT,
+    ef_money_growth TEXT,
+    ef_money_growth_data TEXT,
+    ef_money_sd TEXT,
+    ef_money_sd_data TEXT,
+    ef_money_inflation TEXT,
+    ef_money_inflation_data TEXT,
+    ef_money_currency TEXT,
+    ef_money TEXT,
+    ef_trade_tariffs_revenue TEXT,
+    ef_trade_tariffs_revenue_data TEXT,
+    ef_trade_tariffs_mean TEXT,
+    ef_trade_tariffs_mean_data TEXT,
+    ef_trade_tariffs_sd TEXT,
+    ef_trade_tariffs_sd_data TEXT,
+    ef_trade_tariffs TEXT,
+    ef_trade_regulatory_nontariff TEXT,
+    ef_trade_regulatory_compliance TEXT,
+    ef_trade_regulatory TEXT,
+    ef_trade_black TEXT,
+    ef_trade_movement_open TEXT,
+    ef_trade_movement_capital TEXT,
+    ef_trade_movement_visit TEXT,
+    ef_trade_movement TEXT,
+    ef_trade TEXT,
+    ef_regulation_credit_ownership TEXT,
+    ef_regulation_credit_private TEXT,
+    ef_regulation_credit_interest TEXT,
+    ef_regulation_credit TEXT,
+    ef_regulation_labor_minwage TEXT,
+    ef_regulation_labor_firing TEXT,
+    ef_regulation_labor_bargain TEXT,
+    ef_regulation_labor_hours TEXT,
+    ef_regulation_labor_dismissal TEXT,
+    ef_regulation_labor_conscription TEXT,
+    ef_regulation_labor TEXT,
+    ef_regulation_business_adm TEXT,
+    ef_regulation_business_burden TEXT,
+    ef_regulation_business_start TEXT,
+    ef_regulation_business_impartial TEXT,
+    ef_regulation_business_licensing TEXT,
+    ef_regulation_business_compliance TEXT,
+    ef_regulation_business TEXT,
+    ef_regulation TEXT,
+    ef_score TEXT,
+    ef_rank TEXT
+);
 
--- make second table which we will use to clean
--- CREATE TABLE cleanedtable (
---    id INT AUTO_INCREMENT PRIMARY KEY,
---    column1 VARCHAR(255),
---    column2 VARCHAR(255),
---    );
--- Define all columns as nullable initially? maybe helps cleaning
-    
--- insert our imported table into our cleaning table
--- INSERT INTO cleanedtable
--- SELECT * FROM stagingtable;
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/10_the_human_freedom_index/0_Raw/hfi_cc_2022.csv'
+INTO TABLE 10_the_human_freedom_index.freedomindex_raw_data_staging
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(year, countries, region, hf_score, hf_rank, hf_quartile, pf_rol_procedural, pf_rol_civil, pf_rol_criminal, pf_rol_vdem, pf_rol, pf_ss_homicide, pf_ss_homicide_data, pf_ss_disappearances_disap, pf_ss_disappearances_violent, pf_ss_disappearances_violent_data, pf_ss_disappearances_organized, pf_ss_disappearances_fatalities, pf_ss_disappearances_fatalities_data, pf_ss_disappearances_injuries, pf_ss_disappearances_injuries_data, pf_ss_disappearances_torture, pf_ss_killings, pf_ss_disappearances, pf_ss, pf_movement_vdem_foreign, pf_movement_vdem_men, pf_movement_vdem_women, pf_movement_vdem, pf_movement_cld, pf_movement, pf_religion_freedom_vdem, pf_religion_freedom_cld, pf_religion_freedom, pf_religion_suppression, pf_religion, pf_assembly_entry, pf_assembly_freedom_house, pf_assembly_freedom_bti, pf_assembly_freedom_cld, pf_assembly_freedom, pf_assembly_parties_barriers, pf_assembly_parties_bans, pf_assembly_parties_auton, pf_assembly_parties, pf_assembly_civil, pf_assembly, pf_expression_direct_killed, pf_expression_direct_killed_data, pf_expression_direct_jailed, pf_expression_direct_jailed_data, pf_expression_direct, pf_expression_vdem_cultural, pf_expression_vdem_harass, pf_expression_vdem_gov, pf_expression_vdem_internet, pf_expression_vdem_selfcens, pf_expression_vdem, pf_expression_house, pf_expression_bti, pf_expression_cld, pf_expression, pf_identity_same_m, pf_identity_same_f, pf_identity_same, pf_identity_divorce, pf_identity_inheritance_widows, pf_identity_inheritance_daughters, pf_identity_inheritance, pf_identity_fgm, pf_identity, pf_score, pf_rank, ef_government_consumption, ef_government_consumption_data, ef_government_transfers, ef_government_transfers_data, ef_government_investment, ef_government_investment_data, ef_government_tax_income, ef_government_tax_income_data, ef_government_tax_payroll, ef_government_tax_payroll_data, ef_government_tax, ef_government_soa, ef_government, ef_legal_judicial, ef_legal_courts, ef_legal_protection, ef_legal_military, ef_legal_integrity, ef_legal_enforcement, ef_legal_regulatory, ef_legal_police, ef_gender, ef_legal, ef_money_growth, ef_money_growth_data, ef_money_sd, ef_money_sd_data, ef_money_inflation, ef_money_inflation_data, ef_money_currency, ef_money, ef_trade_tariffs_revenue, ef_trade_tariffs_revenue_data, ef_trade_tariffs_mean, ef_trade_tariffs_mean_data, ef_trade_tariffs_sd, ef_trade_tariffs_sd_data, ef_trade_tariffs, ef_trade_regulatory_nontariff, ef_trade_regulatory_compliance, ef_trade_regulatory, ef_trade_black, ef_trade_movement_open, ef_trade_movement_capital, ef_trade_movement_visit, ef_trade_movement, ef_trade, ef_regulation_credit_ownership, ef_regulation_credit_private, ef_regulation_credit_interest, ef_regulation_credit, ef_regulation_labor_minwage, ef_regulation_labor_firing, ef_regulation_labor_bargain, ef_regulation_labor_hours, ef_regulation_labor_dismissal, ef_regulation_labor_conscription, ef_regulation_labor, ef_regulation_business_adm, ef_regulation_business_burden, ef_regulation_business_start, ef_regulation_business_impartial, ef_regulation_business_licensing, ef_regulation_business_compliance, ef_regulation_business, ef_regulation, ef_score, ef_rank);
 
--- create log table, to properly track which changes have been made
--- CREATE TABLE DFNAME_cleaning_log (
--- id INT AUTO_INCREMENT PRIMARY KEY,
--- cleaning_date DATE,
--- operation VARCHAR(255),
--- affected_rows INT,
--- notes TEXT
--- );
+-- Create cleaning table
+CREATE TABLE 10_the_human_freedom_index.freedomindex_cleaned_data LIKE 10_the_human_freedom_index.freedomindex_raw_data_staging;
+
+-- Copy data to cleaning table
+INSERT INTO 10_the_human_freedom_index.freedomindex_cleaned_data
+SELECT * FROM 10_the_human_freedom_index.freedomindex_raw_data_staging;
+
+-- Create log table
+CREATE TABLE 10_the_human_freedom_index.freedomindex_cleaning_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cleaning_date DATE,
+    operation TEXT,
+    affected_rows INT,
+    notes TEXT
+);
+
+-- Log initial setup
+INSERT INTO 10_the_human_freedom_index.freedomindex_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-07-29', 'Table creation', 3465, 'Created staging, cleaning and logging tables.');

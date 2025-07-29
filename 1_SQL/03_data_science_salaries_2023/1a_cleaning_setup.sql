@@ -1,37 +1,44 @@
--- create first base table setup, define all columns as nullable initially (or able to have empty strings)
--- CREATE TABLE stagingtable (
---    id INT AUTO_INCREMENT PRIMARY KEY,
---    column1 VARCHAR(255),
---    column2 VARCHAR(255),
---    );
-    
--- Importing data with INFILE instead of import wizard. Since data is NOT clean and very large
--- LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/0.XX_DFNAME/0.XX.1_Raw/DATASET.csv'
--- INTO TABLE stagingtable
--- FIELDS TERMINATED BY ','
--- ENCLOSED BY '"'
--- LINES TERMINATED BY '\n'
--- -- IGNORE 1 ROWS -- only need this if 1st row is empty
--- (id, column1, column2
--- );
+-- Create raw staging table
+CREATE TABLE 03_data_science_salaries_2023.ds_salaries_raw_data_staging (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    work_year VARCHAR(255),
+    experience_level VARCHAR(255),
+    employment_type VARCHAR(255),
+    job_title VARCHAR(255),
+    salary VARCHAR(255),
+    salary_currency VARCHAR(255),
+    salary_in_usd VARCHAR(255),
+    employee_residence VARCHAR(255),
+    remote_ratio VARCHAR(255),
+    company_location VARCHAR(255),
+    company_size VARCHAR(255)
+);
 
--- make second table which we will use to clean
--- CREATE TABLE cleanedtable (
---    id INT AUTO_INCREMENT PRIMARY KEY,
---    column1 VARCHAR(255),
---    column2 VARCHAR(255),
---    );
--- Define all columns as nullable initially? maybe helps cleaning
-    
--- insert our imported table into our cleaning table
--- INSERT INTO cleanedtable
--- SELECT * FROM stagingtable;
+-- Load CSV data
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/03_data_science_salaries_2023/0_Raw/ds_salaries.csv'
+INTO TABLE 03_data_science_salaries_2023.ds_salaries_raw_data_staging
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(work_year, experience_level, employment_type, job_title, salary, salary_currency, salary_in_usd, employee_residence, remote_ratio, company_location, company_size);
 
--- create log table, to properly track which changes have been made
--- CREATE TABLE DFNAME_cleaning_log (
--- id INT AUTO_INCREMENT PRIMARY KEY,
--- cleaning_date DATE,
--- operation VARCHAR(255),
--- affected_rows INT,
--- notes TEXT
--- );
+-- Create cleaning table
+CREATE TABLE 03_data_science_salaries_2023.ds_salaries_cleaned_data LIKE 03_data_science_salaries_2023.ds_salaries_raw_data_staging;
+
+-- Copy data to cleaning table
+INSERT INTO 03_data_science_salaries_2023.ds_salaries_cleaned_data
+SELECT * FROM 03_data_science_salaries_2023.ds_salaries_raw_data_staging;
+
+-- Create log table
+CREATE TABLE 03_data_science_salaries_2023.ds_salaries_cleaning_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cleaning_date DATE,
+    operation VARCHAR(255),
+    affected_rows INT,
+    notes TEXT
+);
+
+-- Log initial setup
+INSERT INTO 03_data_science_salaries_2023.ds_salaries_cleaning_log (cleaning_date, operation, affected_rows, notes)
+VALUES ('2025-06-30', 'Table creation', 3755, 'Created staging, cleaning and logging tables.');
